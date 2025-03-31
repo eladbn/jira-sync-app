@@ -21,7 +21,7 @@ interface NotificationState {
 /**
  * Main issues listing page component
  */
-const IssuesPage: React.FC = () => {
+const IssuesPage = (): JSX.Element => {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [columns, setColumns] = useState<TableColumn[]>([]);
   const [syncing, setSyncing] = useState<boolean>(false);

@@ -57,7 +57,7 @@ const theme = createTheme({
  * Main Application component
  * Provides routing and theme configuration
  */
-const App: React.FC = () => {
+const App: React.FC = (): React.ReactElement => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

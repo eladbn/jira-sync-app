@@ -20,6 +20,7 @@
         "test": "concurrently \"cd server && npm test\" \"cd client && npm test\""
     },
     "devDependencies": {
+        "@types/node": "^22.13.14",
         "concurrently": "^8.2.0"
     }
 }

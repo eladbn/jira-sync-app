@@ -12,7 +12,7 @@ interface JiraConfigProps {
   onConfigSaved?: () => void;
 }
 
-const JiraConfig: React.FC<JiraConfigProps> = ({ onConfigSaved }): React.ReactNode => {
+const JiraConfig: React.FC<JiraConfigProps> = ({ onConfigSaved }): React.ReactElement => {
   const [config, setConfig] = useState<JiraConfigType>({
     baseUrl: '',
     apiToken: '',

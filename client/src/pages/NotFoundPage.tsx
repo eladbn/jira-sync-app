@@ -7,7 +7,7 @@ import { Home as HomeIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-materia
 /**
  * NotFoundPage component displayed when a route doesn't match any defined routes
  */
-const NotFoundPage: React.FC = () => {
+const NotFoundPage = (): JSX.Element => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {

@@ -10,13 +10,10 @@ import { FieldMapping as FieldMappingType } from '../../types/config';
 import { getConfig, updateFieldMappings, getJiraFields } from '../../services/api';
 
 interface FieldMappingProps {
-  onMappingsSaved?: () => void;
-}
-
-/**
- * Component for managing Jira field mappings
- */
-const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
+    onMappingsSaved?: () => void;
+  }
+  
+const FieldMapping = ({ onMappingsSaved }: FieldMappingProps): JSX.Element => {
   const [mappings, setMappings] = useState<FieldMappingType[]>([]);
   const [availableFields, setAvailableFields] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

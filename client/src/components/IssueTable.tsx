@@ -1,6 +1,6 @@
  
 // client/src/components/IssueTable.tsx
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, 
@@ -14,11 +14,11 @@ import { getIssues, syncIssues } from '../services/api';
 import { formatDate } from '../utils/dateUtils';
 
 interface IssueTableProps {
-  columns: TableColumn[];
-  onSyncComplete?: () => void;
+    columns: TableColumn[];
+    onSyncComplete?: () => void;
 }
 
-const IssueTable: React.FC<IssueTableProps> = ({ columns, onSyncComplete }) => {
+const IssueTable = ({ columns, onSyncComplete }: IssueTableProps): JSX.Element => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [syncing, setSyncing] = useState<boolean>(false);

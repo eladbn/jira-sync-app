@@ -29,7 +29,7 @@ interface IssueDetailsPageParams {
 /**
  * Component for displaying detailed information about a specific issue
  */
-const IssueDetailsPage = (): ReactElement => {
+const IssueDetailsPage = (): JSX.Element => {
   const { issueKey } = useParams<keyof IssueDetailsPageParams>() as IssueDetailsPageParams;
   const [issue, setIssue] = useState<Issue | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

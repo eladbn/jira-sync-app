@@ -1,7 +1,7 @@
 // client/src/components/layout/Layout.tsx
-import React, { useState, ReactElement } from 'react';
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { styled, useTheme, Theme, SxProps } from '@mui/material/styles';
+import { styled, useTheme, Theme } from '@mui/material/styles';
 import { 
   Box, AppBar as MuiAppBar, Toolbar, Typography, IconButton, Drawer, 
   List, Divider, ListItem, ListItemButton, ListItemIcon, 
@@ -75,7 +75,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 /**
  * Main layout component with sidebar navigation
  */
-const Layout = (): ReactElement => {
+const Layout = (): JSX.Element => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [open, setOpen] = useState(!isMobile);

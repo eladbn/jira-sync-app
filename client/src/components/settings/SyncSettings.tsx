@@ -15,7 +15,7 @@ interface SyncSettingsProps {
 /**
  * Component for configuring synchronization settings
  */
-const SyncSettings = ({ onSettingsSaved }: SyncSettingsProps): JSX.Element => {
+const SyncSettings: React.FC<SyncSettingsProps> = ({ onSettingsSaved }): React.ReactElement => {
   const [syncInterval, setSyncInterval] = useState<number>(60);
   const [customInterval, setCustomInterval] = useState<number | ''>('' as number | '');
   const [loading, setLoading] = useState<boolean>(true);
