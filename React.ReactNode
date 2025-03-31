@@ -1,0 +1,8 @@
+// client/src/types/ui.ts
+export interface TableColumn {
+  id: string;
+  label: string;
+  visible: boolean;
+  sortable?: boolean;
+  width?: string;
+  formatter?: (value: any, row: any
