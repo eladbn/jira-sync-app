@@ -14,3 +14,11 @@ export interface JiraIssue {
     labels: string[];
     [key: string]: any; // Allow for dynamic fields
   }
+
+export interface JiraConfig {
+  baseUrl: string;
+  email: string;
+  apiToken: string;
+  projectKey: string;
+  jqlQuery?: string; // Optional field
+}

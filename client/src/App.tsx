@@ -53,6 +53,10 @@ const theme = createTheme({
   },
 });
 
+/**
+ * Main Application component
+ * Provides routing and theme configuration
+ */
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>

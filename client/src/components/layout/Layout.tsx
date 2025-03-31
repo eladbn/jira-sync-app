@@ -1,10 +1,9 @@
- 
 // client/src/components/layout/Layout.tsx
-import React, { useState } from 'react';
+import React, { useState, ReactElement } from 'react';
 import { Outlet } from 'react-router-dom';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled, useTheme, Theme, SxProps } from '@mui/material/styles';
 import { 
-  Box, AppBar, Toolbar, Typography, IconButton, Drawer, 
+  Box, AppBar as MuiAppBar, Toolbar, Typography, IconButton, Drawer, 
   List, Divider, ListItem, ListItemButton, ListItemIcon, 
   ListItemText, CssBaseline, useMediaQuery
 } from '@mui/material';
@@ -20,10 +19,16 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+// Use styled components with proper type annotations
+interface MainProps {
   open?: boolean;
-}>(({ theme, open }) => ({
+}
+
+const Main = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<MainProps>(({ theme, open }) => ({
   flexGrow: 1,
+  padding: theme.spacing(3),
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -38,9 +43,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   }),
 }));
 
-const AppBarStyled = styled(AppBar, {
+interface AppBarProps {
+  open?: boolean;
+}
+
+const AppBarStyled = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
-})<{ open?: boolean }>(({ theme, open }) => ({
+})<AppBarProps>(({ theme, open }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -63,12 +72,15 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const Layout: React.FC = () => {
+/**
+ * Main layout component with sidebar navigation
+ */
+const Layout = (): ReactElement => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [open, setOpen] = useState(!isMobile);
 
-  const handleDrawerToggle = () => {
+  const handleDrawerToggle = (): void => {
     setOpen(!open);
   };
 

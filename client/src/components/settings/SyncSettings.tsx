@@ -1,6 +1,5 @@
- 
 // client/src/components/settings/SyncSettings.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { 
   Paper, Typography, Box, Alert, CircularProgress, Divider,
   FormControl, InputLabel, Select, MenuItem, Button,
@@ -13,16 +12,19 @@ interface SyncSettingsProps {
   onSettingsSaved?: () => void;
 }
 
-const SyncSettings: React.FC<SyncSettingsProps> = ({ onSettingsSaved }) => {
+/**
+ * Component for configuring synchronization settings
+ */
+const SyncSettings = ({ onSettingsSaved }: SyncSettingsProps): JSX.Element => {
   const [syncInterval, setSyncInterval] = useState<number>(60);
-  const [customInterval, setCustomInterval] = useState<number | ''>('');
+  const [customInterval, setCustomInterval] = useState<number | ''>('' as number | '');
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
   
   // Fetch current sync settings on component mount
   useEffect(() => {
-    const fetchConfig = async () => {
+    const fetchConfig = async (): Promise<void> => {
       setLoading(true);
       try {
         const appConfig = await getConfig();
@@ -49,7 +51,7 @@ const SyncSettings: React.FC<SyncSettingsProps> = ({ onSettingsSaved }) => {
   }, []);
   
   // Handle interval change
-  const handleIntervalChange = (event: SelectChangeEvent<number>) => {
+  const handleIntervalChange = (event: SelectChangeEvent<number>): void => {
     const value = event.target.value as number;
     setSyncInterval(value);
     
@@ -60,7 +62,7 @@ const SyncSettings: React.FC<SyncSettingsProps> = ({ onSettingsSaved }) => {
   };
   
   // Handle custom interval change
-  const handleCustomIntervalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCustomIntervalChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const value = event.target.value;
     
     // Allow empty string or convert to number
@@ -75,7 +77,7 @@ const SyncSettings: React.FC<SyncSettingsProps> = ({ onSettingsSaved }) => {
   };
   
   // Handle form submit
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setSaving(true);
     setAlert(null);

@@ -1,4 +1,3 @@
- 
 // server/src/services/jira-service.ts
 import axios, { AxiosInstance } from 'axios';
 import { JiraIssue, JiraConfig } from '../types/jira';

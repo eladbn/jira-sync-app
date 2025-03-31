@@ -1,6 +1,5 @@
- 
 // client/src/pages/IssuesPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Container, Typography, Box, Paper, Breadcrumbs, 
   Link, Divider, Snackbar, Alert, Button
@@ -13,19 +12,59 @@ import { AppConfig } from '../types/config';
 import { TableColumn } from '../types/ui';
 import { formatDate } from '../utils/dateUtils';
 
+interface NotificationState {
+  open: boolean;
+  message: string;
+  severity: 'success' | 'error' | 'info' | 'warning';
+}
+
+/**
+ * Main issues listing page component
+ */
 const IssuesPage: React.FC = () => {
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [columns, setColumns] = useState<TableColumn[]>([]);
   const [syncing, setSyncing] = useState<boolean>(false);
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error' | 'info' | 'warning';
-  }>({
+  const [notification, setNotification] = useState<NotificationState>({
     open: false,
     message: '',
     severity: 'info'
   });
+
+  // Define the default columns once outside the component
+  const defaultColumns: TableColumn[] = [
+    { id: 'key', label: 'Key', visible: true, width: '100px' },
+    { id: 'summary', label: 'Summary', visible: true },
+    { id: 'status', label: 'Status', visible: true, width: '120px' },
+    { id: 'issueType', label: 'Type', visible: true, width: '120px' },
+    { id: 'assignee', label: 'Assignee', visible: true, width: '150px' },
+    { id: 'updated', label: 'Updated', visible: true, width: '150px' }
+  ];
+
+  // Column width mapping
+  const widthMap: Record<string, string> = {
+    'key': '100px',
+    'issueType': '120px',
+    'status': '120px',
+    'priority': '120px',
+    'assignee': '150px',
+    'reporter': '150px',
+    'created': '150px',
+    'updated': '150px'
+  };
+
+  const getColumnWidth = useCallback((fieldName: string): string | undefined => {
+    return widthMap[fieldName];
+  }, []);
+
+  // Extract notification logic to a separate function
+  const showNotification = useCallback((message: string, severity: 'success' | 'error' | 'info' | 'warning' = 'info') => {
+    setNotification({
+      open: true,
+      message,
+      severity
+    });
+  }, []);
 
   // Fetch config on component mount
   useEffect(() => {
@@ -33,16 +72,6 @@ const IssuesPage: React.FC = () => {
       try {
         const appConfig = await getConfig();
         setConfig(appConfig);
-
-        // Set up table columns based on field mappings
-        const defaultColumns: TableColumn[] = [
-          { id: 'key', label: 'Key', visible: true, width: '100px' },
-          { id: 'summary', label: 'Summary', visible: true },
-          { id: 'status', label: 'Status', visible: true, width: '120px' },
-          { id: 'issueType', label: 'Type', visible: true, width: '120px' },
-          { id: 'assignee', label: 'Assignee', visible: true, width: '150px' },
-          { id: 'updated', label: 'Updated', visible: true, width: '150px' }
-        ];
 
         if (appConfig.fieldMappings && appConfig.fieldMappings.length > 0) {
           // Map field mappings to table columns
@@ -63,26 +92,12 @@ const IssuesPage: React.FC = () => {
     };
 
     fetchConfig();
-  }, []);
-
-  // Get default column width based on field type
-  const getColumnWidth = (fieldName: string): string | undefined => {
-    const widthMap: Record<string, string> = {
-      'key': '100px',
-      'issueType': '120px',
-      'status': '120px',
-      'priority': '120px',
-      'assignee': '150px',
-      'reporter': '150px',
-      'created': '150px',
-      'updated': '150px'
-    };
-
-    return widthMap[fieldName];
-  };
+  }, [getColumnWidth, showNotification, defaultColumns]);
 
   // Handle manual sync
   const handleSync = async () => {
+    if (syncing) return;
+    
     setSyncing(true);
     try {
       const result = await syncIssues();
@@ -100,26 +115,21 @@ const IssuesPage: React.FC = () => {
   };
 
   // Handle sync complete callback from table
-  const handleSyncComplete = async () => {
-    // Refresh config to update lastSyncTime
-    const updatedConfig = await getConfig();
-    setConfig(updatedConfig);
-    showNotification('Successfully synced issues from Jira', 'success');
-  };
-
-  // Show notification
-  const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning' = 'info') => {
-    setNotification({
-      open: true,
-      message,
-      severity
-    });
-  };
+  const handleSyncComplete = useCallback(async () => {
+    try {
+      // Refresh config to update lastSyncTime
+      const updatedConfig = await getConfig();
+      setConfig(updatedConfig);
+      showNotification('Successfully synced issues from Jira', 'success');
+    } catch (error) {
+      console.error('Error updating config after sync:', error);
+    }
+  }, [showNotification]);
 
   // Close notification
-  const handleCloseNotification = () => {
+  const handleCloseNotification = useCallback(() => {
     setNotification(prev => ({ ...prev, open: false }));
-  };
+  }, []);
 
   return (
     <Container maxWidth="xl">
@@ -156,11 +166,11 @@ const IssuesPage: React.FC = () => {
             )}
           </Typography>
           
-          <RouterLink to="/settings" style={{ textDecoration: 'none' }}>
+          <Box component={RouterLink} to="/settings" style={{ textDecoration: 'none' }}>
             <Link component="span" underline="hover">
               Configure Fields
             </Link>
-          </RouterLink>
+          </Box>
         </Box>
         
         <IssueTable columns={columns} onSyncComplete={handleSyncComplete} />

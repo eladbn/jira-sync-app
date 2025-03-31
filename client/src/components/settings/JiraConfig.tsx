@@ -1,4 +1,3 @@
- 
 // client/src/components/settings/JiraConfig.tsx
 import React, { useState, useEffect } from 'react';
 import { 
@@ -13,7 +12,7 @@ interface JiraConfigProps {
   onConfigSaved?: () => void;
 }
 
-const JiraConfig: React.FC<JiraConfigProps> = ({ onConfigSaved }) => {
+const JiraConfig: React.FC<JiraConfigProps> = ({ onConfigSaved }): React.ReactNode => {
   const [config, setConfig] = useState<JiraConfigType>({
     baseUrl: '',
     apiToken: '',

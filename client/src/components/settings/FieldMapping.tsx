@@ -1,10 +1,9 @@
- 
 // client/src/components/settings/FieldMapping.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { 
   Paper, Typography, Box, Alert, CircularProgress, Divider,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  TextField, Switch, Button, IconButton, Tooltip, FormControlLabel
+  TextField, Switch, Button, IconButton, Tooltip, FormControlLabel, MenuItem
 } from '@mui/material';
 import { Save, Add, Delete, Refresh } from '@mui/icons-material';
 import { FieldMapping as FieldMappingType } from '../../types/config';
@@ -14,6 +13,9 @@ interface FieldMappingProps {
   onMappingsSaved?: () => void;
 }
 
+/**
+ * Component for managing Jira field mappings
+ */
 const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   const [mappings, setMappings] = useState<FieldMappingType[]>([]);
   const [availableFields, setAvailableFields] = useState<{ id: string; name: string }[]>([]);
@@ -24,7 +26,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   
   // Fetch current mappings and available fields on component mount
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       setLoading(true);
       try {
         const appConfig = await getConfig();
@@ -60,7 +62,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   }, []);
   
   // Fetch available Jira fields
-  const fetchJiraFields = async () => {
+  const fetchJiraFields = async (): Promise<void> => {
     setLoadingFields(true);
     try {
       const fields = await getJiraFields();
@@ -82,7 +84,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   };
   
   // Handle adding a new mapping
-  const handleAddMapping = () => {
+  const handleAddMapping = (): void => {
     setMappings(prev => [
       ...prev,
       { originalName: '', displayName: '', visible: true }
@@ -90,12 +92,12 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   };
   
   // Handle removing a mapping
-  const handleRemoveMapping = (index: number) => {
+  const handleRemoveMapping = (index: number): void => {
     setMappings(prev => prev.filter((_, i) => i !== index));
   };
   
   // Handle mapping field change
-  const handleMappingChange = (index: number, field: keyof FieldMappingType, value: string | boolean) => {
+  const handleMappingChange = (index: number, field: keyof FieldMappingType, value: string | boolean): void => {
     setMappings(prev => {
       const updated = [...prev];
       updated[index] = {
@@ -107,7 +109,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
   };
   
   // Handle form submit
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setSaving(true);
     setAlert(null);
@@ -147,6 +149,22 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
       </Box>
     );
   }
+  
+  // Standard field options
+  const standardFields = [
+    { id: '', name: 'Select a field' },
+    { id: 'summary', name: 'Summary' },
+    { id: 'description', name: 'Description' },
+    { id: 'status', name: 'Status' },
+    { id: 'issueType', name: 'Issue Type' },
+    { id: 'priority', name: 'Priority' },
+    { id: 'assignee', name: 'Assignee' },
+    { id: 'reporter', name: 'Reporter' },
+    { id: 'created', name: 'Created Date' },
+    { id: 'updated', name: 'Updated Date' },
+    { id: 'components', name: 'Components' },
+    { id: 'labels', name: 'Labels' }
+  ];
   
   return (
     <Paper sx={{ p: 3 }}>
@@ -194,32 +212,28 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
                       fullWidth
                       size="small"
                       value={mapping.originalName}
-                      onChange={(e) => handleMappingChange(index, 'originalName', e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => handleMappingChange(index, 'originalName', e.target.value)}
                       select
-                      SelectProps={{
-                        native: true
-                      }}
                       required
                     >
-                      <option value="">Select a field</option>
-                      {/* Standard Jira fields */}
-                      <option value="summary">Summary</option>
-                      <option value="description">Description</option>
-                      <option value="status">Status</option>
-                      <option value="issueType">Issue Type</option>
-                      <option value="priority">Priority</option>
-                      <option value="assignee">Assignee</option>
-                      <option value="reporter">Reporter</option>
-                      <option value="created">Created Date</option>
-                      <option value="updated">Updated Date</option>
-                      <option value="components">Components</option>
-                      <option value="labels">Labels</option>
+                      {/* Standard fields */}
+                      {standardFields.map((field) => (
+                        <MenuItem key={`std-${field.id}`} value={field.id}>
+                          {field.name}
+                        </MenuItem>
+                      ))}
                       
                       {/* Dynamic Jira fields */}
+                      {availableFields.length > 0 && (
+                        <MenuItem disabled divider>
+                          ----- Custom Fields -----
+                        </MenuItem>
+                      )}
+                      
                       {availableFields.map((field) => (
-                        <option key={field.id} value={field.id}>
+                        <MenuItem key={`dyn-${field.id}`} value={field.id}>
                           {field.name}
-                        </option>
+                        </MenuItem>
                       ))}
                     </TextField>
                   </TableCell>
@@ -228,7 +242,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
                       fullWidth
                       size="small"
                       value={mapping.displayName}
-                      onChange={(e) => handleMappingChange(index, 'displayName', e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => handleMappingChange(index, 'displayName', e.target.value)}
                       placeholder="Display name"
                       required
                     />
@@ -238,7 +252,7 @@ const FieldMapping: React.FC<FieldMappingProps> = ({ onMappingsSaved }) => {
                       control={
                         <Switch
                           checked={mapping.visible}
-                          onChange={(e) => handleMappingChange(index, 'visible', e.target.checked)}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => handleMappingChange(index, 'visible', e.target.checked)}
                           color="primary"
                         />
                       }
